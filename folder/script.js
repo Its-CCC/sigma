@@ -25,13 +25,16 @@ const soundMap = {
   spider: "https://minecraft.wiki/images/Spider1.ogg"
 };
 
-const wikiImageMap = {
-  zombie: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Minecraft_Zombie.png/250px-Minecraft_Zombie.png",
-  skeleton: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Minecraft_Skeleton.png/250px-Minecraft_Skeleton.png",
-  creeper: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Minecraft_Creeper.png/250px-Minecraft_Creeper.png",
-  enderman: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Minecraft_Enderman.png/250px-Minecraft_Enderman.png",
-  pig: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Minecraft_Pig.png/250px-Minecraft_Pig.png",
-  spider: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Minecraft_Spider.png/250px-Minecraft_Spider.png"
+const fandomImageMap = {
+  cow: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/5e/Cow_JE5_BE2.png/revision/latest?cb=20240729214026",
+  pig: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/1/1a/Pig_JE3_BE2.png/revision/latest?cb=20251004183015",
+  sheep: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/e/e2/White_Sheep_JE3_BE6.png/revision/latest?cb=20190809163123",
+  zombie: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/87/Zombie_JE3_BE2.png/revision/latest?cb=20191227070025",
+  creeper: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/5b/Creeper_JE2_BE1.png/revision/latest?cb=20191229172043",
+  skeleton: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/47/Skeleton_JE6_BE4.png/revision/latest?cb=20210227130136",
+  enderman: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/2/28/Enderman.png/revision/latest?cb=20240729214332",
+  spider: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/1/1f/Spider_JE4_BE3.png/revision/latest?cb=20240729213340",
+  blaze: "https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d0/Blaze_JE2.png/revision/latest?cb=20190511085904"
 };
 
 const fallbackMobs = [
@@ -51,7 +54,7 @@ let audio = null;
 let mobs = [];
 
 function getMobImage(id) {
-  return wikiImageMap[id] || `https://mc-heads.net/head/${encodeURIComponent(id)}`;
+  return fandomImageMap[id] || `https://mc-heads.net/head/${encodeURIComponent(id)}`;
 }
 
 function buildMobData(apiMob) {
