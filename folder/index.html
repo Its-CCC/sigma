@@ -11,7 +11,7 @@
 
 <header>
   <h1>MobGuessr</h1>
-  <p>Guess Minecraft mobs by image + sound</p>
+  <p>Guess Minecraft mobs by image</p>
 </header>
 
 <nav>
@@ -32,13 +32,13 @@
   <!-- GAME -->
   <div id="gameScreen" class="hidden">
 
-    <p id="currentPoints">Current points: 0</p>
+    <p id="currentPoints" aria-live="polite">Current points: 0</p>
 
     <h2>What mob is this?</h2>
 
-    <div class="image-sound-player">
-      <img id="mobImage" src="" alt="mob">
-      <button id="playSoundAgainButton">Play Sound</button>
+    <div class="image-player" aria-label="Current mob image question">
+      <img id="mobImage" src="" alt="Minecraft mob image" aria-describedby="mobImageCaption">
+      <p id="mobImageCaption" class="image-caption">A Minecraft mob image will appear here for the current question.</p>
     </div>
 
     <div class="options-container">
@@ -48,6 +48,7 @@
       <button class="option-button"></button>
     </div>
 
+    <div id="confettiContainer" aria-hidden="true"></div>
   </div>
 
   <!-- RESULTS -->
@@ -60,7 +61,14 @@
   <!-- SETTINGS -->
   <div id="colorBlindnessSettingsScreen" class="hidden">
     <h2>Settings</h2>
-    <p>Color options (not functional yet)</p>
+    <label for="colorModeSelect">Color mode:</label>
+    <select id="colorModeSelect">
+      <option value="normal">Normal</option>
+      <option value="protanopia">Protanopia</option>
+      <option value="deuteranopia">Deuteranopia</option>
+      <option value="tritanopia">Tritanopia</option>
+    </select>
+    <p>Choose a color palette optimized for color-blind viewers.</p>
     <button id="settingsBackButton">Back</button>
   </div>
 
