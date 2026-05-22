@@ -1,2 +1,0 @@
-# sigma
-super sugma code
