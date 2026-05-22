@@ -5,7 +5,7 @@ MobGuessr is a lightweight browser game that shows Minecraft mob images and asks
 
 Features
 --------
-- Uses canonical mob images from Minecraft Fandom (no mc-heads fallback).
+- Uses canonical mob images from Minecraft Fandom .
 - Responsive, touch-friendly UI for mobile devices.
 - Color-blindness palettes (Normal / Protanopia / Deuteranopia / Tritanopia) with persistence.
 - Accessibility improvements: descriptive alt text, captions, focus outlines, and ARIA live regions.
@@ -51,7 +51,7 @@ Next improvements
 
 License
 -------
-- MIT (feel free to change)
+- MIT 
 
 Credits
 -------
