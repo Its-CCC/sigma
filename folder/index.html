@@ -17,6 +17,7 @@
 <nav>
   <ul>
     <li><a href="#" id="leaderboardLink">Leaderboard</a></li>
+    <li><a href="#" id="multiplayerLink">Multiplayer</a></li>
     <li><a href="#" id="colorBlindnessLink">Settings</a></li>
   </ul>
 </nav>
@@ -72,12 +73,53 @@
     <button id="settingsBackButton">Back</button>
   </div>
 
+  <!-- MULTIPLAYER -->
+  <div id="multiplayerScreen" class="hidden">
+    <h2>Multiplayer</h2>
+    <p>Connect with another player on a different computer using a shared room ID.</p>
+    <div class="multiplayer-panel">
+      <button id="createRoomButton">Create room</button>
+      <label for="joinRoomInput">Join room:</label>
+      <input id="joinRoomInput" type="text" placeholder="Enter room ID">
+      <button id="joinRoomButton">Join room</button>
+    </div>
+    <p id="roomStatus" class="image-caption">Not connected.</p>
+    <div class="multiplayer-scores">
+      <p>You: <strong id="localScoreDisplay">0</strong></p>
+      <p>Teammate: <strong id="remoteScoreDisplay">0</strong></p>
+    </div>
+    <button id="multiplayerBackButton">Back</button>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div id="leaderboardScreen" class="hidden">
+    <h2>Leaderboard</h2>
+    <table class="leaderboard-table" aria-label="Leaderboard">
+      <thead>
+        <tr>
+          <th scope="col">Rank</th>
+          <th scope="col">Player</th>
+          <th scope="col">Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Alex</td><td>32</td></tr>
+        <tr><td>2</td><td>Ender</td><td>27</td></tr>
+        <tr><td>3</td><td>Nova</td><td>23</td></tr>
+        <tr><td>4</td><td>Jade</td><td>19</td></tr>
+        <tr><td>5</td><td>Moosh</td><td>15</td></tr>
+      </tbody>
+    </table>
+    <button id="leaderboardBackButton">Back</button>
+  </div>
+
 </main>
 
 <footer>
   <p>MobGuessr</p>
 </footer>
 
+<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
 <script src="script.js"></script>
 
 </body>

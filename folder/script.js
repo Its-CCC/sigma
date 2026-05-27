@@ -2,6 +2,7 @@ const startScreen = document.getElementById("startScreen");
 const gameScreen = document.getElementById("gameScreen");
 const resultsScreen = document.getElementById("resultsScreen");
 const settingsScreen = document.getElementById("colorBlindnessSettingsScreen");
+const leaderboardScreen = document.getElementById("leaderboardScreen");
 
 const startButton = document.getElementById("startButton");
 const mobImage = document.getElementById("mobImage");
@@ -12,8 +13,23 @@ const optionButtons = document.querySelectorAll(".option-button");
 const currentPoints = document.getElementById("currentPoints");
 const finalPoints = document.getElementById("finalPoints");
 const colorBlindnessLink = document.getElementById("colorBlindnessLink");
+const leaderboardLink = document.getElementById("leaderboardLink");
+const multiplayerLink = document.getElementById("multiplayerLink");
 const settingsBackButton = document.getElementById("settingsBackButton");
+const leaderboardBackButton = document.getElementById("leaderboardBackButton");
+const multiplayerBackButton = document.getElementById("multiplayerBackButton");
 const colorModeSelect = document.getElementById("colorModeSelect");
+const multiplayerScreen = document.getElementById("multiplayerScreen");
+const createRoomButton = document.getElementById("createRoomButton");
+const joinRoomInput = document.getElementById("joinRoomInput");
+const joinRoomButton = document.getElementById("joinRoomButton");
+const roomStatus = document.getElementById("roomStatus");
+const localScoreDisplay = document.getElementById("localScoreDisplay");
+const remoteScoreDisplay = document.getElementById("remoteScoreDisplay");
+
+let peer = null;
+let currentConnection = null;
+let remotePlayerScore = 0;
 
 const API_URL = "https://api.astroworldmc.com/api/v1/mobs";
 // Mapping of mob id -> canonical Minecraft Fandom image URL
@@ -122,7 +138,78 @@ function show(screen) {
   gameScreen.classList.add("hidden");
   resultsScreen.classList.add("hidden");
   settingsScreen.classList.add("hidden");
+  if (leaderboardScreen) leaderboardScreen.classList.add("hidden");
+  if (multiplayerScreen) multiplayerScreen.classList.add("hidden");
   screen.classList.remove("hidden");
+}
+
+function initMultiplayer() {
+  if (!window.Peer || peer) return;
+  peer = new Peer();
+  peer.on('open', (id) => {
+    roomStatus.textContent = `Your room ID: ${id}. Share it with a friend.`;
+  });
+  peer.on('connection', (conn) => {
+    setupConnection(conn);
+  });
+  peer.on('error', (error) => {
+    roomStatus.textContent = `Multiplayer error: ${error.type || error}`;
+  });
+}
+
+function setupConnection(conn) {
+  if (currentConnection && currentConnection.open) {
+    conn.on('open', () => conn.send({ type: 'info', message: 'Already connected' }));
+    return;
+  }
+  currentConnection = conn;
+  roomStatus.textContent = `Connected with ${conn.peer}.`; 
+  conn.on('data', handlePeerData);
+  conn.on('close', () => {
+    roomStatus.textContent = 'Connection closed.';
+    currentConnection = null;
+  });
+}
+
+function sendPeerMessage(data) {
+  if (currentConnection && currentConnection.open) {
+    currentConnection.send(data);
+  }
+}
+
+function handlePeerData(data) {
+  if (!data || typeof data !== 'object') return;
+  if (data.type === 'score') {
+    remotePlayerScore = data.score;
+    if (remoteScoreDisplay) remoteScoreDisplay.textContent = remotePlayerScore;
+  }
+}
+
+function createRoom() {
+  initMultiplayer();
+  if (peer && peer.id) {
+    roomStatus.textContent = `Room created. Share this ID: ${peer.id}`;
+  }
+}
+
+function joinRoom() {
+  const targetId = joinRoomInput.value.trim();
+  if (!targetId) {
+    roomStatus.textContent = 'Enter a valid room ID to join.';
+    return;
+  }
+  initMultiplayer();
+  if (!peer) return;
+  const conn = peer.connect(targetId);
+  conn.on('open', () => setupConnection(conn));
+  conn.on('error', () => {
+    roomStatus.textContent = 'Unable to connect to that room.';
+  });
+}
+
+function syncScore() {
+  if (localScoreDisplay) localScoreDisplay.textContent = score;
+  sendPeerMessage({ type: 'score', score });
 }
 
 function launchConfetti() {
@@ -156,9 +243,9 @@ function loadQuestion() {
   }
   currentMob = mobs[Math.floor(Math.random() * mobs.length)];
   mobImage.src = currentMob.image;
-  mobImage.alt = `Minecraft mob image of ${currentMob.name}`;
+  mobImage.alt = "Minecraft mob image";
   if (mobImageCaption) {
-    mobImageCaption.textContent = `Image showing a Minecraft ${currentMob.name}. Use the question text to make your guess.`;
+    mobImageCaption.textContent = "A Minecraft mob image for the current question. Use the options to make your guess.";
   }
   const answers = [currentMob.name];
   while (answers.length < 4) {
@@ -181,6 +268,7 @@ function selectAnswer(button) {
   if (answer === currentMob.name) {
     score++;
     currentPoints.textContent = "Current points: " + score;
+    syncScore();
     launchConfetti();
     loadQuestion();
   } else {
@@ -199,6 +287,7 @@ startButton.onclick = async () => {
   }
   score = 0;
   currentPoints.textContent = "Current points: 0";
+  syncScore();
   show(gameScreen);
   loadQuestion();
 };
@@ -208,7 +297,21 @@ colorBlindnessLink.onclick = (event) => {
   show(settingsScreen);
 };
 
+leaderboardLink.onclick = (event) => {
+  event.preventDefault();
+  show(leaderboardScreen);
+};
+
+multiplayerLink.onclick = (event) => {
+  event.preventDefault();
+  show(multiplayerScreen);
+};
+
+createRoomButton.onclick = createRoom;
+joinRoomButton.onclick = joinRoom;
 settingsBackButton.onclick = () => show(startScreen);
+leaderboardBackButton.onclick = () => show(startScreen);
+multiplayerBackButton.onclick = () => show(startScreen);
 show(startScreen);
 
 window.addEventListener('keydown', (event) => {

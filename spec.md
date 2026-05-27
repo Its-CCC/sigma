@@ -7,7 +7,10 @@ Problem Statement:
 
  What if we designed a guessing game where players have to guess what minecraft mob is which based on sound, or visuals
 Game Mechanics:
-Look at mob, click mob name
+- Players connect across computers using a room ID.
+- Each player views a Minecraft mob image and chooses the correct mob name from four options.
+- Correct guesses increase the player's score and sync the score to the connected teammate.
+- The multiplayer screen shows connected status and the teammate's score in real time.
 
 ## Milestone 2 — Wireframes
 

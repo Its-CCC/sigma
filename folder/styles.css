@@ -85,6 +85,65 @@ main {
   display: none;
 }
 
+.leaderboard-note {
+  margin: 0 auto 14px;
+  max-width: 360px;
+  font-size: 0.98rem;
+  color: var(--text);
+}
+
+.leaderboard-table {
+  width: min(100%, 420px);
+  margin: 0 auto 16px;
+  border-collapse: collapse;
+  background: var(--img-bg);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 10px 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.leaderboard-table th {
+  background: var(--nav);
+}
+
+.leaderboard-table tbody tr:nth-child(odd) {
+  background: rgba(255,255,255,0.55);
+}
+
+.multiplayer-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  max-width: 420px;
+  margin: 0 auto 16px;
+}
+
+.multiplayer-panel label {
+  display: block;
+  min-width: 100px;
+}
+
+.multiplayer-panel input {
+  flex: 1 1 180px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.15);
+}
+
+.multiplayer-scores {
+  display: grid;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
 /* IMAGE FIX */
 #mobImage {
   width: 250px;
