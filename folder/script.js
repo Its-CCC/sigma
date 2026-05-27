@@ -167,19 +167,26 @@ function loadQuestion() {
   }
   answers.sort(() => Math.random() - 0.5);
   optionButtons.forEach((btn, i) => {
-    btn.textContent = answers[i];
-    btn.onclick = () => {
-      if (btn.textContent === currentMob.name) {
-        score++;
-        currentPoints.textContent = "Current points: " + score;
-        launchConfetti();
-        loadQuestion();
-      } else {
-        finalPoints.textContent = score;
-        show(resultsScreen);
-      }
-    };
+    const answerText = answers[i];
+    btn.dataset.answer = answerText;
+    btn.textContent = `${i + 1}. ${answerText}`;
+    btn.setAttribute('aria-label', `Answer ${i + 1}: ${answerText}`);
+    btn.onclick = () => selectAnswer(btn);
   });
+}
+
+function selectAnswer(button) {
+  const answer = button.dataset.answer;
+  if (!answer || !currentMob) return;
+  if (answer === currentMob.name) {
+    score++;
+    currentPoints.textContent = "Current points: " + score;
+    launchConfetti();
+    loadQuestion();
+  } else {
+    finalPoints.textContent = score;
+    show(resultsScreen);
+  }
 }
 
 startButton.onclick = async () => {
@@ -203,6 +210,15 @@ colorBlindnessLink.onclick = (event) => {
 
 settingsBackButton.onclick = () => show(startScreen);
 show(startScreen);
+
+window.addEventListener('keydown', (event) => {
+  if (gameScreen.classList.contains('hidden')) return;
+  const key = event.key;
+  if (!['1', '2', '3', '4'].includes(key)) return;
+  const index = Number(key) - 1;
+  const button = optionButtons[index];
+  if (button) button.click();
+});
 
 // Initialize color mode selector and apply saved preference
 (function(){
