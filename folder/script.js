@@ -143,11 +143,21 @@ function show(screen) {
   screen.classList.remove("hidden");
 }
 
+function generateRoomCode() {
+  const characters = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return code;
+}
+
 function initMultiplayer() {
   if (!window.Peer || peer) return;
-  peer = new Peer();
+  const roomCode = generateRoomCode();
+  peer = new Peer(roomCode);
   peer.on('open', (id) => {
-    roomStatus.textContent = `Your room ID: ${id}. Share it with a friend.`;
+    roomStatus.textContent = `Your room code: ${id}. Share it with a friend.`;
   });
   peer.on('connection', (conn) => {
     setupConnection(conn);
