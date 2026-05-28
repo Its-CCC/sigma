@@ -5,10 +5,11 @@ MobGuessr is a lightweight browser game that shows Minecraft mob images and asks
 
 Features
 --------
-- Uses canonical mob images from Minecraft Fandom .
+- Uses canonical mob images from Minecraft Fandom.
 - Responsive, touch-friendly UI for mobile devices.
 - Color-blindness palettes (Normal / Protanopia / Deuteranopia / Tritanopia) with persistence.
 - Accessibility improvements: descriptive alt text, captions, focus outlines, and ARIA live regions.
+- Multiplayer mode using PeerJS room codes with an explicit Start round button and 60-second timed rounds.
 - Confetti celebration on correct answers.
 
 Quick start
@@ -31,6 +32,7 @@ How it works
 ------------
 - `folder/script.js` fetches a mob list from the Astroworld API and maps mob ids to fandom image URLs defined in the `fandomImageMap`.
 - Only mobs with a known fandom image are shown; duplicates (same image used by multiple ids) are filtered out.
+- Multiplayer uses PeerJS and short room codes; once connected, players press Start round to begin a shared 60-second timed session with live score sync.
 - The settings screen exposes a color-mode selector which persists to `localStorage` and applies CSS variable overrides.
 
 Development notes

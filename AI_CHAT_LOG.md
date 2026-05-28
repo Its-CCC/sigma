@@ -74,6 +74,21 @@ This file contains the working conversation log for the `sigma` project.
 
 **Assistant:** Updated `AI_CHAT_LOG.md` with this current conversation history.
 
+### 15. Fix multiplayer start flow
+**User:** add a start button in the multiplayer to make it start the game as when you connect the game doesnt start
+
+**Assistant:** Added an explicit multiplayer start button and connection logic so a connected player can start the round manually.
+
+### 16. Fix multiplayer timer
+**User:** upon hitting start it instantly ends the game, there should be 60 seconds
+
+**Assistant:** Fixed `startMultiplayerRound()` so it loads mob data before starting and begins a proper 60-second timer.
+
+### 17. Update README, AI chat logs, and spec docs
+**User:** update read me ai chat logs and the spec md files
+
+**Assistant:** Updated `README.md`, `spec.md`, and `AI_CHAT_LOG.md` to describe the explicit multiplayer start flow, 60-second timed rounds, and current project behavior.
+
 ## Notes
 
 - The conversation log is stored in `AI_CHAT_LOG.md`.

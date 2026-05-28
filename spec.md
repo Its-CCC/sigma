@@ -37,8 +37,9 @@ Behavior and features (accurate)
 - Multiplayer (current implementation)
   - Peer-to-peer via PeerJS (the CDN script is included in `index.html`).
   - The client generates a short 6-character room code (`generateRoomCode()`), then creates a PeerJS peer with that ID. The other player connects using the same code.
-  - On connection, clients exchange lightweight messages such as `{type: 'score', score: <n>}` so each side can display the other's score in near-real time.
-  - Multiplayer in this prototype syncs scores only; gameplay remains local (no authoritative server or synchronized rounds).
+  - Once connected, players use an explicit Start round button to begin a shared 60-second timed multiplayer session.
+  - Clients exchange lightweight messages such as `{type: 'score', score: <n>}` so each side can display the other's score in near-real time.
+  - Gameplay remains local and peer-synced; there is no authoritative server or persistent multiplayer backend yet.
 
 Known limitations and cautions
 -----------------------------
@@ -50,7 +51,7 @@ Known limitations and cautions
 How to run and test locally
 ---------------------------
 - Quick test (no server): open `folder/index.html` in a browser.
-- To simulate multiplayer locally: open two tabs or two browsers, create a room in one, join with the generated code in the other, and verify score messages sync when answering.
+- To simulate multiplayer locally: open two tabs or two browsers, create a room in one, join with the generated code in the other, press Start round, and verify the 60-second timer runs while local/remote scores sync when answering.
 - Optional: serve the folder with a simple static server to avoid file:// restrictions:
 
 ```bash
@@ -73,7 +74,7 @@ Short-term roadmap
 
 Document history
 ----------------
-- Last updated: (this commit) — reflects current repository layout and behavior.
+- Last updated: (this commit) — reflects current multiplayer start-button flow, 60-second timed rounds, and updated docs.
 
 ---
 
