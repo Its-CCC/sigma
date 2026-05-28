@@ -286,8 +286,17 @@ function syncScore() {
   sendPeerMessage({ type: 'score', score });
 }
 
-function startMultiplayerRound() {
+async function startMultiplayerRound() {
   if (multiplayerActive) return;
+  if (!mobs.length) {
+    roomStatus.textContent = 'Loading mobs for multiplayer...';
+    await fetchMobData();
+    if (!mobs.length) {
+      roomStatus.textContent = 'Unable to load mob questions. Try again later.';
+      return;
+    }
+  }
+
   multiplayerActive = true;
   localEnded = false;
   remoteEnded = false;
