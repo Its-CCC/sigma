@@ -26,6 +26,7 @@ const joinRoomButton = document.getElementById("joinRoomButton");
 const roomStatus = document.getElementById("roomStatus");
 const localScoreDisplay = document.getElementById("localScoreDisplay");
 const remoteScoreDisplay = document.getElementById("remoteScoreDisplay");
+const multiplayerStartButton = document.getElementById("startMultiplayerButton");
 
 let peer = null;
 let currentConnection = null;
@@ -191,10 +192,12 @@ function setupConnection(conn) {
   conn.on('close', () => {
     roomStatus.textContent = 'Connection closed.';
     currentConnection = null;
+    updateMultiplayerStartButton();
   });
   conn.on('open', () => {
     // signal ready when connection opens
     try { conn.send({ type: 'ready' }); localReady = true; } catch (e){}
+    updateMultiplayerStartButton();
     // If host and remote already signalled ready, start a synchronized round
     if (isHost && remoteReady) {
       setTimeout(() => {
@@ -207,6 +210,18 @@ function setupConnection(conn) {
 function sendPeerMessage(data) {
   if (currentConnection && currentConnection.open) {
     currentConnection.send(data);
+  }
+}
+
+function updateMultiplayerStartButton() {
+  if (!multiplayerStartButton) return;
+  if (currentConnection && currentConnection.open && !multiplayerActive) {
+    multiplayerStartButton.classList.remove('hidden');
+    multiplayerStartButton.disabled = false;
+    multiplayerStartButton.textContent = 'Start round';
+  } else {
+    multiplayerStartButton.classList.add('hidden');
+    multiplayerStartButton.disabled = true;
   }
 }
 
@@ -242,13 +257,16 @@ function handlePeerData(data) {
 }
 
 function createRoom() {
+  isHost = true;
   initMultiplayer();
   if (peer && peer.id) {
     roomStatus.textContent = `Room created. Share this ID: ${peer.id}`;
   }
+  updateMultiplayerStartButton();
 }
 
 function joinRoom() {
+  isHost = false;
   const targetId = joinRoomInput.value.trim();
   if (!targetId) {
     roomStatus.textContent = 'Enter a valid room ID to join.';
@@ -289,6 +307,7 @@ function startMultiplayerRound() {
   currentPoints.textContent = "Current points: 0";
   show(gameScreen);
   loadQuestion();
+  updateMultiplayerStartButton();
 }
 
 function updateTimerDisplay(){
@@ -301,6 +320,7 @@ function endMultiplayerRound(){
   localEnded = true;
   if (timerDisplay) timerDisplay.style.display = 'none';
   sendPeerMessage({ type: 'end', score });
+  updateMultiplayerStartButton();
   if (remoteEnded) showMultiplayerResult();
 }
 
@@ -431,6 +451,14 @@ multiplayerLink.onclick = (event) => {
 
 createRoomButton.onclick = createRoom;
 joinRoomButton.onclick = joinRoom;
+if (multiplayerStartButton) multiplayerStartButton.onclick = () => {
+  if (!currentConnection || !currentConnection.open) {
+    roomStatus.textContent = 'Connect before starting the round.';
+    return;
+  }
+  sendPeerMessage({ type: 'start' });
+  startMultiplayerRound();
+};
 settingsBackButton.onclick = () => show(startScreen);
 leaderboardBackButton.onclick = () => show(startScreen);
 multiplayerBackButton.onclick = () => show(startScreen);
