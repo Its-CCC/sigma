@@ -37,6 +37,8 @@
 
     <h2>What mob is this?</h2>
 
+    <p id="timerDisplay" class="image-caption" aria-live="polite" style="display:none">Time left: 60s</p>
+
     <div class="image-player" aria-label="Current mob image question">
       <img id="mobImage" src="" alt="Minecraft mob image" aria-describedby="mobImageCaption">
       <p id="mobImageCaption" class="image-caption">A Minecraft mob image will appear here for the current question.</p>
@@ -57,6 +59,13 @@
     <h2>Game Over!</h2>
     <h3>Score: <span id="finalPoints">0</span></h3>
     <button onclick="location.reload()">Play Again</button>
+  </div>
+
+  <!-- MULTIPLAYER RESULT -->
+  <div id="multiplayerResultScreen" class="hidden">
+    <h2 id="multiplayerResultTitle">Result</h2>
+    <p id="multiplayerResultDetail" class="image-caption"></p>
+    <button id="multiplayerResultBack">Back</button>
   </div>
 
   <!-- SETTINGS -->

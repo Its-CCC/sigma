@@ -30,6 +30,19 @@ const remoteScoreDisplay = document.getElementById("remoteScoreDisplay");
 let peer = null;
 let currentConnection = null;
 let remotePlayerScore = 0;
+let isHost = false;
+let localReady = false;
+let remoteReady = false;
+let multiplayerActive = false;
+let localEnded = false;
+let remoteEnded = false;
+let roundTimer = null;
+let timeLeft = 60;
+const timerDisplay = document.getElementById('timerDisplay');
+const multiplayerResultScreen = document.getElementById('multiplayerResultScreen');
+const multiplayerResultTitle = document.getElementById('multiplayerResultTitle');
+const multiplayerResultDetail = document.getElementById('multiplayerResultDetail');
+const multiplayerResultBack = document.getElementById('multiplayerResultBack');
 
 const API_URL = "https://api.astroworldmc.com/api/v1/mobs";
 // Mapping of mob id -> canonical Minecraft Fandom image URL
@@ -179,6 +192,16 @@ function setupConnection(conn) {
     roomStatus.textContent = 'Connection closed.';
     currentConnection = null;
   });
+  conn.on('open', () => {
+    // signal ready when connection opens
+    try { conn.send({ type: 'ready' }); localReady = true; } catch (e){}
+    // If host and remote already signalled ready, start a synchronized round
+    if (isHost && remoteReady) {
+      setTimeout(() => {
+        try { conn.send({ type: 'start' }); startMultiplayerRound(); } catch (e){}
+      }, 500);
+    }
+  });
 }
 
 function sendPeerMessage(data) {
@@ -192,6 +215,29 @@ function handlePeerData(data) {
   if (data.type === 'score') {
     remotePlayerScore = data.score;
     if (remoteScoreDisplay) remoteScoreDisplay.textContent = remotePlayerScore;
+    return;
+  }
+  if (data.type === 'ready') {
+    remoteReady = true;
+    if (isHost && localReady && remoteReady && currentConnection && currentConnection.open) {
+      try { currentConnection.send({ type: 'start' }); startMultiplayerRound(); } catch(e){}
+    }
+    return;
+  }
+  if (data.type === 'start') {
+    startMultiplayerRound();
+    return;
+  }
+  if (data.type === 'end') {
+    remoteEnded = true;
+    remotePlayerScore = Number(data.score) || 0;
+    if (remoteScoreDisplay) remoteScoreDisplay.textContent = remotePlayerScore;
+    if (localEnded) showMultiplayerResult();
+    return;
+  }
+  if (data.type === 'info' && data.message) {
+    roomStatus.textContent = data.message;
+    return;
   }
 }
 
@@ -221,6 +267,67 @@ function syncScore() {
   if (localScoreDisplay) localScoreDisplay.textContent = score;
   sendPeerMessage({ type: 'score', score });
 }
+
+function startMultiplayerRound() {
+  if (multiplayerActive) return;
+  multiplayerActive = true;
+  localEnded = false;
+  remoteEnded = false;
+  timeLeft = 60;
+  if (timerDisplay) timerDisplay.style.display = 'block';
+  updateTimerDisplay();
+  roundTimer = setInterval(() => {
+    timeLeft -= 1;
+    updateTimerDisplay();
+    if (timeLeft <= 0) {
+      clearInterval(roundTimer);
+      roundTimer = null;
+      endMultiplayerRound();
+    }
+  }, 1000);
+  score = 0;
+  currentPoints.textContent = "Current points: 0";
+  show(gameScreen);
+  loadQuestion();
+}
+
+function updateTimerDisplay(){
+  if (!timerDisplay) return;
+  timerDisplay.textContent = `Time left: ${timeLeft}s`;
+}
+
+function endMultiplayerRound(){
+  multiplayerActive = false;
+  localEnded = true;
+  if (timerDisplay) timerDisplay.style.display = 'none';
+  sendPeerMessage({ type: 'end', score });
+  if (remoteEnded) showMultiplayerResult();
+}
+
+function showMultiplayerResult(){
+  let title = 'Result';
+  let detail = '';
+  if (score > remotePlayerScore) {
+    title = 'You win!';
+    detail = `You scored ${score} and your opponent scored ${remotePlayerScore}. Congratulations!`;
+  } else if (score < remotePlayerScore) {
+    title = 'You lost';
+    detail = `You scored ${score} and your opponent scored ${remotePlayerScore}. Better luck next time.`;
+  } else {
+    title = "It's a tie";
+    detail = `Both scored ${score}.`;
+  }
+  if (multiplayerResultTitle) multiplayerResultTitle.textContent = title;
+  if (multiplayerResultDetail) multiplayerResultDetail.textContent = detail;
+  show(multiplayerResultScreen);
+}
+
+if (multiplayerResultBack) multiplayerResultBack.onclick = () => {
+  try { if (currentConnection && currentConnection.close) currentConnection.close(); } catch(e){}
+  try { if (peer && peer.destroy) peer.destroy(); } catch(e){}
+  peer = null; currentConnection = null; isHost = false; localReady = false; remoteReady = false; multiplayerActive = false; localEnded = false; remoteEnded = false;
+  show(startScreen);
+};
 
 function launchConfetti() {
   if (!confettiContainer) return;
@@ -282,8 +389,13 @@ function selectAnswer(button) {
     launchConfetti();
     loadQuestion();
   } else {
-    finalPoints.textContent = score;
-    show(resultsScreen);
+    if (multiplayerActive) {
+      // during timed multiplayer rounds, incorrect answers do not end the round
+      loadQuestion();
+    } else {
+      finalPoints.textContent = score;
+      show(resultsScreen);
+    }
   }
 }
 

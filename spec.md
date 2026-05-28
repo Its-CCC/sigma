@@ -1,118 +1,82 @@
-## Milestone 1 — Plan and site map
+MobGuessr — Project Specification
 
-Description of Game:
-Guess minecraft mobs by their picture
+Overview
+--------
+MobGuessr is a lightweight browser game that shows Minecraft mob images and asks players to identify the mob from multiple-choice answers. The project emphasizes accessibility, responsive UI for phones/tablets/desktops, and an optional peer-to-peer multiplayer mode using short room codes.
 
-Problem Statement:
+Current repository state
+------------------------
+- Frontend-only: open `folder/index.html` in a browser to run locally (no build step required).
+- Key files:
+  - `folder/index.html` — UI and screens: Start, Game, Results, Settings, Multiplayer, Leaderboard (placeholder)
+  - `folder/styles.css` — CSS variables, responsive rules, color-blind presets, multiplayer & leaderboard styles
+  - `folder/script.js` — game logic, mob-image mapping, Astroworld API fetch fallback, PeerJS-based multiplayer
+  - `README.md` — user-facing docs and usage notes
+  - `AI_CHAT_LOG.md` — saved conversation history and changelog notes
+  - `spec.md` — this file
 
- What if we designed a guessing game where players have to guess what minecraft mob is which based on sound, or visuals
-Game Mechanics:
-## Milestone 2 — Wireframes
-Wireframe: 
+Behavior and features (accurate)
+--------------------------------
+- Mob data
+  - The app attempts to fetch mob metadata from `https://api.astroworldmc.com/api/v1/mobs`.
+  - `folder/script.js` contains a `fandomImageMap` mapping mob IDs to canonical Minecraft Fandom image URLs. Entries without a mapped Fandom image are skipped to avoid using inaccurate mob-head proxies.
+  - A `fallbackMobs` list exists inside `script.js` to provide a local set when the API is unavailable.
 
-# MobGuessr — Project Specification
+- Single-player gameplay
+  - Each round shows one mob image and four answer options.
+  - Players select answers by clicking/tapping buttons or pressing keys `1`–`4`.
+  - Correct answer: +1 point, confetti animation, immediately loads next question.
+  - Incorrect answer: ends the session and shows the results screen with final score.
 
-## Overview
-MobGuessr is a lightweight browser game that shows Minecraft mob images and asks players to identify the mob from multiple choice answers. The project prioritizes accessibility, mobile support, and an optional cross-computer multiplayer mode for shared play.
+- Accessibility
+  - Buttons are focusable, have ARIA labels, and display visible focus outlines.
+  - Images include non-revealing `alt` text and a caption that describes the stimulus without naming the answer.
+  - Color-blindness presets (Normal / Protanopia / Deuteranopia / Tritanopia) are implemented and persisted in `localStorage`.
+  - Touch-friendly sizing and responsive layout for mobile devices.
 
-## Goals
-- Provide a simple, fast, and accessible single-player experience.
-- Allow optional cross-computer multiplayer via short room codes to compare scores in real time.
-- Use canonical Minecraft Fandom images (not mob-head proxies) for visual accuracy.
-- Keep the UI responsive and keyboard friendly (1-4 keys select answers).
+- Multiplayer (current implementation)
+  - Peer-to-peer via PeerJS (the CDN script is included in `index.html`).
+  - The client generates a short 6-character room code (`generateRoomCode()`), then creates a PeerJS peer with that ID. The other player connects using the same code.
+  - On connection, clients exchange lightweight messages such as `{type: 'score', score: <n>}` so each side can display the other's score in near-real time.
+  - Multiplayer in this prototype syncs scores only; gameplay remains local (no authoritative server or synchronized rounds).
 
-## Technical Stack
-- Plain HTML / CSS / JavaScript (no build step required)
-- Peer-to-peer connectivity via PeerJS for optional multiplayer
-- External mob metadata from: `https://api.astroworldmc.com/api/v1/mobs`
+Known limitations and cautions
+-----------------------------
+- PeerJS in this repo relies on public signaling brokers for prototyping. For production, consider hosting a private signaling server or using an authenticated relay to improve reliability and security.
+- The leaderboard in the UI is a static placeholder; there is no server-side persistent leaderboard yet.
+- External Fandom image URLs may be subject to CORS restrictions or future URL changes. For stability, consider bundling vetted images or using an image proxy/service.
+- Peer-to-peer NAT/firewall traversal can fail in some network environments; consider adding a signaling server or TURN relay for reliability.
 
-## Repository Layout
-- `folder/index.html` — application UI and screens
-- `folder/styles.css` — styles, responsive rules, color-blind palettes
-- `folder/script.js` — game logic, mob loading, multiplayer sync
-- `spec.md` — this specification
-- `README.md` — user-facing documentation
+How to run and test locally
+---------------------------
+- Quick test (no server): open `folder/index.html` in a browser.
+- To simulate multiplayer locally: open two tabs or two browsers, create a room in one, join with the generated code in the other, and verify score messages sync when answering.
+- Optional: serve the folder with a simple static server to avoid file:// restrictions:
 
-## Gameplay (detailed mechanics)
-- Each round presents one mob image and four answer options.
-- Players may select an answer by clicking a button or pressing `1`/`2`/`3`/`4` on the keyboard.
-- Correct answer: +1 point, confetti feedback, next question loads immediately.
-- Incorrect answer: game ends and final score is shown; player may restart.
-- Questions are drawn from a filtered list of mobs that have canonical Fandom images to avoid empty or misleading assets.
+```bash
+python3 -m http.server 8000
+# then open http://localhost:8000/folder/
+```
 
-## Multiplayer (cross-computer)
-- Mode: optional two-player peer-to-peer session using short 6-character room codes.
-- Flow:
-	1. Player A taps `Create room` — the client generates a 6-character room code and initializes a PeerJS peer with that ID.
-	2. Player A shares the code with Player B (out-of-band). Player B enters the code and taps `Join room` to connect.
-	3. When connected, each client sends score updates (`{type: 'score', score: <n>}`) to the peer; both UIs show local and remote scores.
- 4. The game experience remains local — each player plays independently — but scores are synchronized for friendly competition.
-- Security & reliability notes: PeerJS public brokers are used for signaling in this prototype. For production, host a dedicated signaling server or implement an authenticated relay.
+Testing checklist
+-----------------
+- Verify images load for the default mob set by inspecting `fandomImageMap` in `folder/script.js`.
+- Keyboard accessibility: use `Tab` to focus answer buttons and `1`–`4` to submit.
+- Multiplayer connectivity: Create a room and join from another tab/device; confirm local/remote scores update when answering.
 
-## Accessibility
-- Keyboard-first controls (numeric keys + focusable buttons). ARIA labels applied to interactive elements.
-- Images include `alt` text and a concise caption describing the stimulus (no revealing answer text in captions).
-- Color-blindness presets available and persisted via `localStorage`.
-- Focus-visible outlines, large touch targets, and sufficient contrast (target WCAG AA where feasible).
+Short-term roadmap
+------------------
+- Replace placeholder leaderboard with a small backend (Node/Express + JSON or a lightweight database) to persist high scores and show server-sorted leaderboards.
+- Add optional synchronized multiplayer modes (round-based or head-to-head) with an authoritative coordinator (either peer-elected or server-backed).
+- Harden multiplayer transport (private signaling server, TURN relay) for more consistent cross-network connectivity.
+- Add automated image availability checks and graceful fallback UIs when images fail to load.
 
-## UI / UX
-- Minimal layout: header, nav (Leaderboard / Multiplayer / Settings), game area, and results screen.
-- Responsive grid for answer buttons; touch-friendly sizes on mobile.
-- Confetti animation provides celebratory feedback for correct guesses without relying on color alone.
-
-## Assets
-- All mob images are canonical Fandom assets mapped by mob ID in `script.js`.
-- No sounds are included in the current build to keep the app simple and focused on accessibility.
-
-## Testing & Validation
-- Manual playthrough on desktop and mobile (responsive checks).
-- Keyboard navigation test: `Tab` focus, `Enter`/`Space` activation, `1-4` keys for answers.
-- Peer connection test: create/join a room across two devices on different networks (or use local browser tabs for quick checks).
-
-## Roadmap / Enhancements
-- Persist high scores to a backend leaderboard (optional) and replace the placeholder table.
-- Add more multiplayer modes (simultaneous, head-to-head rounds, time-limited rounds).
-- Improve matchmaking and room discovery (server-backed) for larger player counts.
-
-## Success Metrics
-- Players can complete a full session without UI or accessibility blockers.
-- Multiplayer room connects reliably with short codes in typical network environments.
-- No missing images or empty questions in the default mob set.
+Document history
+----------------
+- Last updated: (this commit) — reflects current repository layout and behavior.
 
 ---
-Updated: concise, actionable spec covering gameplay, multiplayer, accessibility, and next steps.
-<img width="1016" height="758" alt="image" src="https://github.com/user-attachments/assets/1080c96d-16bc-4b32-a79a-7914871dfce2" />
 
-
-
-
-Wireframe Notes (provide additional context for your agent to create the sitemap based on your wireframe):
-
-
-
-## Milestone 3 — Designing for consistency
-
-Describe your site aesthetics, including the color palette 
-Very simple, very light green and brown 
-## Milestone 4 — Accessibility
-
-### POUR commitment
-
-Perceivable:
-Text stands out clearly from the background (no low-contrast color)
-Images and stimulus media have alt text or captions that describe them
-Important information isn't shown by color alone (don't rely on red = wrong, green = right)
-
-Operable:
-Everything works with a keyboard, not just a mouse or touchscreen
-Buttons and guess inputs are easy to find, click, or tap
-There's enough time to read and respond — nothing disappears too fast
-
-Understandable:
-Instructions are in clear, simple language
-Navigation works the same way on every screen
-Error messages explain what went wrong and how to fix it (in the voice of your twist)
-Robust: 
-The site loads correctly on phones, tablets, and computers
-HTML is clean and valid so screen readers can navigate it
-Interactive parts (buttons, inputs) work with assistive technologies
+If you'd like, I can also:
+- Create a small server prototype for the leaderboard (Node + Express + JSON file) and wire the frontend to it.
+- Add an image availability checker script that warns about missing Fandom URLs.
