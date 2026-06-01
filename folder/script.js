@@ -519,3 +519,55 @@ window.addEventListener('keydown', (event) => {
   applyColorMode(saved);
   colorModeSelect.onchange = (e) => applyColorMode(e.target.value);
 })();
+
+function getGameState() {
+  return {
+    score,
+    currentMob,
+    mobs,
+    multiplayerActive,
+    timeLeft,
+    localEnded,
+    remoteEnded,
+    remotePlayerScore
+  };
+}
+
+function setGameMobs(newMobs) {
+  mobs = newMobs;
+}
+
+function setCurrentMob(mob) {
+  currentMob = mob;
+}
+
+function resetMultiplayerState() {
+  if (roundTimer) {
+    clearInterval(roundTimer);
+    roundTimer = null;
+  }
+  multiplayerActive = false;
+  localEnded = false;
+  remoteEnded = false;
+  localReady = false;
+  remoteReady = false;
+  remotePlayerScore = 0;
+  if (timerDisplay) timerDisplay.style.display = 'none';
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    fetchMobData,
+    buildMobData,
+    getGameState,
+    setGameMobs,
+    setCurrentMob,
+    resetMultiplayerState,
+    loadQuestion,
+    selectAnswer,
+    startMultiplayerRound,
+    endMultiplayerRound,
+    syncScore,
+    getMobImage
+  };
+}
