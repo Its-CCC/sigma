@@ -156,6 +156,7 @@ function show(screen) {
   settingsScreen.classList.add("hidden");
   if (leaderboardScreen) leaderboardScreen.classList.add("hidden");
   if (multiplayerScreen) multiplayerScreen.classList.add("hidden");
+  if (multiplayerResultScreen) multiplayerResultScreen.classList.add("hidden");
   screen.classList.remove("hidden");
 }
 
@@ -356,7 +357,14 @@ function showMultiplayerResult(){
 if (multiplayerResultBack) multiplayerResultBack.onclick = () => {
   try { if (currentConnection && currentConnection.close) currentConnection.close(); } catch(e){}
   try { if (peer && peer.destroy) peer.destroy(); } catch(e){}
+  // clear any running round timer and hide timer display
+  try { if (roundTimer) { clearInterval(roundTimer); roundTimer = null; } } catch(e){}
+  if (timerDisplay) timerDisplay.style.display = 'none';
+  // reset multiplayer state and displays
   peer = null; currentConnection = null; isHost = false; localReady = false; remoteReady = false; multiplayerActive = false; localEnded = false; remoteEnded = false;
+  if (localScoreDisplay) localScoreDisplay.textContent = 0;
+  if (remoteScoreDisplay) remoteScoreDisplay.textContent = 0;
+  // ensure multiplayer result screen is hidden and return to start
   show(startScreen);
 };
 
