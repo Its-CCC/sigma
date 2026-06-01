@@ -15,6 +15,7 @@ const finalPoints = document.getElementById("finalPoints");
 const colorBlindnessLink = document.getElementById("colorBlindnessLink");
 const leaderboardLink = document.getElementById("leaderboardLink");
 const multiplayerLink = document.getElementById("multiplayerLink");
+const creeperLink = document.getElementById("creeperLink");
 const settingsBackButton = document.getElementById("settingsBackButton");
 const leaderboardBackButton = document.getElementById("leaderboardBackButton");
 const multiplayerBackButton = document.getElementById("multiplayerBackButton");
@@ -27,6 +28,24 @@ const roomStatus = document.getElementById("roomStatus");
 const localScoreDisplay = document.getElementById("localScoreDisplay");
 const remoteScoreDisplay = document.getElementById("remoteScoreDisplay");
 const multiplayerStartButton = document.getElementById("startMultiplayerButton");
+
+// Creeper Clicker elements
+const creeperScreen = document.getElementById("creeperScreen");
+const creeperImage = document.getElementById("creeperImage");
+const creeperCount = document.getElementById("creeperCount");
+const creeperClickButton = document.getElementById("creeperClickButton");
+const creeperResetButton = document.getElementById("creeperResetButton");
+const creeperHigh = document.getElementById("creeperHigh");
+const creeperBackButton = document.getElementById("creeperBackButton");
+const creeperPowerDisplay = document.getElementById("creeperPowerDisplay");
+const creeperAutoCount = document.getElementById("creeperAutoCount");
+const creeperPowerButton = document.getElementById("creeperPowerButton");
+const creeperAutoButton = document.getElementById("creeperAutoButton");
+
+let creeperClicks = (function(){ try{ return Number(localStorage.getItem('creeperClicks')||0) }catch(e){return 0} })();
+let creeperPower = (function(){ try{ return Number(localStorage.getItem('creeperPower')||1) }catch(e){return 1} })();
+let creeperAuto = (function(){ try{ return Number(localStorage.getItem('creeperAuto')||0) }catch(e){return 0} })();
+let autoClickInterval = null;
 
 let peer = null;
 let currentConnection = null;
@@ -482,6 +501,12 @@ leaderboardLink.onclick = (event) => {
   show(leaderboardScreen);
 };
 
+creeperLink.onclick = (event) => {
+  event.preventDefault();
+  loadCreeperState();
+  show(creeperScreen);
+};
+
 multiplayerLink.onclick = (event) => {
   event.preventDefault();
   show(multiplayerScreen);
@@ -500,6 +525,96 @@ if (multiplayerStartButton) multiplayerStartButton.onclick = () => {
 settingsBackButton.onclick = () => show(startScreen);
 leaderboardBackButton.onclick = () => show(startScreen);
 multiplayerBackButton.onclick = () => show(startScreen);
+
+// Creeper clicker handlers
+function getPowerCost() {
+  return 20 * creeperPower;
+}
+function getAutoCost() {
+  return 100 + 50 * creeperAuto;
+}
+function saveCreeperState() {
+  try { localStorage.setItem('creeperClicks', String(creeperClicks)); } catch (e) {}
+  try { localStorage.setItem('creeperPower', String(creeperPower)); } catch (e) {}
+  try { localStorage.setItem('creeperAuto', String(creeperAuto)); } catch (e) {}
+}
+function updateUpgradeButtons() {
+  if (creeperPowerButton) creeperPowerButton.textContent = `Upgrade Power (+1) — ${getPowerCost()} clicks`;
+  if (creeperAutoButton) creeperAutoButton.textContent = `Buy Auto Creeper — ${getAutoCost()} clicks`;
+}
+function maybeStartAutoClickers() {
+  if (autoClickInterval) {
+    clearInterval(autoClickInterval);
+    autoClickInterval = null;
+  }
+  if (creeperAuto > 0) {
+    autoClickInterval = setInterval(() => {
+      addCreeperClicks(creeperPower);
+    }, 2000);
+  }
+}
+function loadCreeperState() {
+  creeperClicks = (function(){ try{ return Number(localStorage.getItem('creeperClicks')||0) }catch(e){return 0} })();
+  creeperPower = (function(){ try{ return Number(localStorage.getItem('creeperPower')||1) }catch(e){return 1} })();
+  creeperAuto = (function(){ try{ return Number(localStorage.getItem('creeperAuto')||0) }catch(e){return 0} })();
+  updateCreeperDisplay();
+  maybeStartAutoClickers();
+}
+function addCreeperClicks(amount) {
+  creeperClicks += amount;
+  const prevHigh = (function(){ try{ return Number(localStorage.getItem('creeperHigh')||0) }catch(e){return 0} })();
+  if (creeperClicks > prevHigh) {
+    try{ localStorage.setItem('creeperHigh', String(creeperClicks)); }catch(e){}
+  }
+  saveCreeperState();
+  updateCreeperDisplay();
+}
+function updateCreeperDisplay(){
+  if (creeperCount) creeperCount.textContent = `Clicks: ${creeperClicks}`;
+  const high = (function(){ try{ return Number(localStorage.getItem('creeperHigh')||0) }catch(e){return 0} })();
+  if (creeperHigh) creeperHigh.textContent = `High: ${high}`;
+  if (creeperPowerDisplay) creeperPowerDisplay.textContent = creeperPower;
+  if (creeperAutoCount) creeperAutoCount.textContent = creeperAuto;
+  updateUpgradeButtons();
+}
+function bumpCreeper(){
+  addCreeperClicks(creeperPower);
+}
+function buyPowerUpgrade() {
+  const cost = getPowerCost();
+  if (creeperClicks >= cost) {
+    creeperClicks -= cost;
+    creeperPower += 1;
+    saveCreeperState();
+    updateCreeperDisplay();
+  }
+}
+function buyAutoUpgrade() {
+  const cost = getAutoCost();
+  if (creeperClicks >= cost) {
+    creeperClicks -= cost;
+    creeperAuto += 1;
+    saveCreeperState();
+    updateCreeperDisplay();
+    maybeStartAutoClickers();
+  }
+}
+if (creeperClickButton) creeperClickButton.onclick = bumpCreeper;
+if (creeperResetButton) creeperResetButton.onclick = () => {
+  creeperClicks = 0;
+  saveCreeperState();
+  updateCreeperDisplay();
+};
+if (creeperPowerButton) creeperPowerButton.onclick = buyPowerUpgrade;
+if (creeperAutoButton) creeperAutoButton.onclick = buyAutoUpgrade;
+if (creeperImage) {
+  creeperImage.onclick = bumpCreeper;
+  creeperImage.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); bumpCreeper(); }
+  });
+}
+if (creeperBackButton) creeperBackButton.onclick = () => show(startScreen);
+
 show(startScreen);
 
 window.addEventListener('keydown', (event) => {

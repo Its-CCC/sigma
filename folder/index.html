@@ -18,6 +18,7 @@
   <ul>
     <li><a href="#" id="leaderboardLink">Leaderboard</a></li>
     <li><a href="#" id="multiplayerLink">Multiplayer</a></li>
+    <li><a href="#" id="creeperLink">Creeper Clicker</a></li>
     <li><a href="#" id="colorBlindnessLink">Settings</a></li>
   </ul>
 </nav>
@@ -39,10 +40,10 @@
 
     <p id="timerDisplay" class="image-caption" aria-live="polite" style="display:none">Time left: 60s</p>
 
-    <div class="image-player" aria-label="Current mob image question">
-      <img id="mobImage" src="" alt="Minecraft mob image" aria-describedby="mobImageCaption">
-      <p id="mobImageCaption" class="image-caption">A Minecraft mob image will appear here for the current question.</p>
-    </div>
+    <figure class="image-player" aria-labelledby="mobImageCaption">
+      <img id="mobImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Minecraft mob image" aria-describedby="mobImageCaption">
+      <figcaption id="mobImageCaption" class="image-caption">A Minecraft mob image will appear here for the current question.</figcaption>
+    </figure>
 
     <div class="options-container">
       <button class="option-button"></button>
@@ -58,11 +59,6 @@
   <div id="resultsScreen" class="hidden">
     <h2>Game Over!</h2>
     <h3>Score: <span id="finalPoints">0</span></h3>
-    <div class="score-submit">
-      <label for="scoreNameInput">Name (optional):</label>
-      <input id="scoreNameInput" type="text" placeholder="Your name">
-      <button id="submitScoreButton">Submit score</button>
-    </div>
     <button onclick="location.reload()">Play Again</button>
   </div>
 
@@ -104,6 +100,32 @@
       <p>Teammate: <strong id="remoteScoreDisplay">0</strong></p>
     </div>
     <button id="multiplayerBackButton">Back</button>
+  </div>
+
+  <!-- CREEPER CLICKER -->
+  <div id="creeperScreen" class="hidden">
+    <h2>Creeper Clicker</h2>
+    <p id="creeperCount" aria-live="polite">Clicks: 0</p>
+    <figure class="image-player">
+      <img id="creeperImage" src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/5b/Creeper_JE2_BE1.png/revision/latest?cb=20191229172043" alt="Creeper" tabindex="0">
+      <figcaption class="image-caption">Click or press Space/Enter on the image to collect creeper clicks.</figcaption>
+    </figure>
+    <div class="creeper-controls">
+      <button id="creeperClickButton">Click Creeper</button>
+      <button id="creeperResetButton">Reset</button>
+      <p id="creeperHigh" class="image-caption">High: 0</p>
+    </div>
+    <div class="creeper-upgrades">
+      <div class="upgrade-card">
+        <p><strong>Power</strong> x<span id="creeperPowerDisplay">1</span></p>
+        <button id="creeperPowerButton">Upgrade Power (+1) — 20 clicks</button>
+      </div>
+      <div class="upgrade-card">
+        <p><strong>Auto Creeper</strong> <span id="creeperAutoCount">0</span></p>
+        <button id="creeperAutoButton">Buy Auto Creeper — 100 clicks</button>
+      </div>
+    </div>
+    <button id="creeperBackButton">Back</button>
   </div>
 
   <!-- LEADERBOARD -->

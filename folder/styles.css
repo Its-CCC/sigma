@@ -256,3 +256,62 @@ button:focus-visible, .option-button:focus-visible, select:focus-visible {
 @media (hover: none) and (pointer: coarse) {
   button, .option-button { padding: 16px 20px; font-size: 1.1rem; }
 }
+
+/* Creeper Clicker styles */
+#creeperImage {
+  width: 260px;
+  height: 260px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  background: var(--img-bg);
+  border: 6px solid #416933;
+  border-radius: 12px;
+  padding: 8px;
+  display: block;
+  margin: 12px auto;
+  cursor: pointer;
+}
+.creeper-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+}
+#creeperCount {
+  font-weight: bold;
+  font-size: 1.25rem;
+  margin-top: 8px;
+}
+#creeperHigh {
+  margin-left: 8px;
+  font-size: 0.95rem;
+}
+@media (max-width: 600px) {
+  #creeperImage { width: 70vw; height: auto; max-width: 320px; }
+  .creeper-controls { flex-direction: column; gap: 8px; }
+}
+
+.creeper-upgrades {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  gap: 12px;
+  max-width: 520px;
+  margin: 16px auto 0;
+}
+.upgrade-card {
+  background: rgba(255,255,255,0.92);
+  padding: 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 12px;
+}
+.upgrade-card p {
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+.upgrade-card button {
+  width: 100%;
+}
+@media (max-width: 600px) {
+  .creeper-upgrades { grid-template-columns: 1fr; }
+}
