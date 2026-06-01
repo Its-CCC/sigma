@@ -44,6 +44,8 @@ const multiplayerResultScreen = document.getElementById('multiplayerResultScreen
 const multiplayerResultTitle = document.getElementById('multiplayerResultTitle');
 const multiplayerResultDetail = document.getElementById('multiplayerResultDetail');
 const multiplayerResultBack = document.getElementById('multiplayerResultBack');
+const scoreNameInput = document.getElementById('scoreNameInput');
+const submitScoreButton = document.getElementById('submitScoreButton');
 
 const API_URL = "https://api.astroworldmc.com/api/v1/mobs";
 // Mapping of mob id -> canonical Minecraft Fandom image URL
@@ -356,6 +358,25 @@ if (multiplayerResultBack) multiplayerResultBack.onclick = () => {
   try { if (peer && peer.destroy) peer.destroy(); } catch(e){}
   peer = null; currentConnection = null; isHost = false; localReady = false; remoteReady = false; multiplayerActive = false; localEnded = false; remoteEnded = false;
   show(startScreen);
+};
+
+async function postScore(name, points) {
+  try {
+    await fetch('/scores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name || 'Player', points: Number(points) || 0 })
+    });
+    roomStatus.textContent = 'Score submitted.';
+  } catch (e) {
+    roomStatus.textContent = 'Could not submit score.';
+  }
+}
+
+if (submitScoreButton) submitScoreButton.onclick = () => {
+  const name = scoreNameInput ? scoreNameInput.value.trim() : 'Player';
+  const points = Number(finalPoints ? finalPoints.textContent : score) || score || 0;
+  postScore(name, points);
 };
 
 function launchConfetti() {

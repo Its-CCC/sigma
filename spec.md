@@ -40,6 +40,7 @@ Behavior and features (accurate)
   - Once connected, players use an explicit Start round button to begin a shared 60-second timed multiplayer session.
   - Clients exchange lightweight messages such as `{type: 'score', score: <n>}` so each side can display the other's score in near-real time.
   - Gameplay remains local and peer-synced; there is no authoritative server or persistent multiplayer backend yet.
+   - A minimal scores backend prototype is included: `GET /scores` and `POST /scores` endpoints store and return persisted leaderboard entries when the optional Node/Express server is running.
 
 Known limitations and cautions
 -----------------------------

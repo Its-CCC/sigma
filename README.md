@@ -22,6 +22,18 @@ python3 -m http.server 8000
 # then open http://localhost:8000/folder/index.html
 ```
 
+Start the optional local scores backend
+-------------------------------------
+To run the minimal scores server (used by the Submit Score button):
+
+```bash
+# install dependencies once
+npm install
+# start the server (listens on port 3000)
+npm start
+# open http://localhost:3000/ to view the game served by the backend
+```
+
 Project layout
 --------------
 - `folder/index.html` — game UI

@@ -89,6 +89,11 @@ This file contains the working conversation log for the `sigma` project.
 
 **Assistant:** Updated `README.md`, `spec.md`, and `AI_CHAT_LOG.md` to describe the explicit multiplayer start flow, 60-second timed rounds, and current project behavior.
 
+### 18. Add minimal scores backend and score submission
+**User:** implement everything
+
+**Assistant:** Added a minimal Node/Express scores backend (`server.js`, `scores.json`, `package.json`) and wired the frontend `results` screen to POST to `/scores`. Updated `README.md` with backend run instructions and `plan.md` statuses.
+
 ## Notes
 
 - The conversation log is stored in `AI_CHAT_LOG.md`.
